@@ -9,6 +9,8 @@ package blackberry.polarmobile.childbrowser
     import flash.geom.Rectangle;
     import flash.display.Stage;
     import flash.events.MouseEvent;
+    import flash.events.Event;
+    import qnx.events.ExtendedLocationChangeEvent;
     import flash.display.Sprite;
     import flash.events.StageOrientationEvent;
     import flash.utils.setTimeout;
@@ -23,6 +25,8 @@ package blackberry.polarmobile.childbrowser
     // webworks
     import webworks.extension.DefaultExtension;
 
+    import flash.events.LocationChangeEvent;
+
     public class ChildBrowser extends DefaultExtension
     {
         private var childWebView:QNXStageWebView = null;
@@ -33,6 +37,7 @@ package blackberry.polarmobile.childbrowser
         private var browserHeight;
         private var isVisible:Boolean = false;
         private var webViewUI:Sprite;
+        private var jsEventHandler:String;
 
 
         //icons
@@ -115,9 +120,11 @@ package blackberry.polarmobile.childbrowser
           }
         }
 
-        public function loadURL(url:String)
+
+        public function loadURL(url:String, myEventHandler:String)
         {
             var self = this;
+            jsEventHandler = myEventHandler;
             browserHeight = webView.stage.stageHeight - 50;
             //if we dont have a webview, make one and put it in the background
             this.createBrowser();
@@ -126,6 +133,18 @@ package blackberry.polarmobile.childbrowser
             //load this url
             childWebView.loadURL(url);
             this.initBG();
+
+            childWebView.addEventListener(LocationChangeEvent.LOCATION_CHANGE,onLocationChanged);
+           
+        }
+
+        private function onLocationChanged(event:ExtendedLocationChangeEvent)
+        {
+            var array:Array = new Array();
+            array[0] = 0;
+            array[1] = childWebView.location;
+            evalJavaScriptEvent(jsEventHandler, array);
+
         }
 
         private function onOrientationChange(event:StageOrientationEvent)
@@ -158,9 +177,13 @@ package blackberry.polarmobile.childbrowser
 
         public function close()
         {
+          var array:Array = new Array();
+          array[0] = 1;
+          array[1] = childWebView.location;
           childWebView.stage = null;
           childWebView.dispose();
           childWebView = null;
+
 
           Tweener.addTween(webViewUI, {
             y: webView.stage.stageHeight,
@@ -169,6 +192,7 @@ package blackberry.polarmobile.childbrowser
             transition: 'easeOutExpo',
             onComplete: closeUI
           });
+          evalJavaScriptEvent(jsEventHandler,array);
         }
 
         private function closeUI()

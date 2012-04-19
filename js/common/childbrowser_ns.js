@@ -2,7 +2,7 @@
 
 	function ChildBrowser(disp) {
 		
-		this.constructor.prototype.loadURL = function(url) { return disp.loadURL(url); };
+		this.constructor.prototype.loadURL = function(url,jsEventHandler) { return disp.loadURL(url,jsEventHandler); };
 		this.constructor.prototype.clearCookies = function() { return disp.clearCookies(); };
 		this.constructor.prototype.getVisible = function() { return disp.getVisible(); };
 		this.constructor.prototype.back = function() { return disp.back(); };

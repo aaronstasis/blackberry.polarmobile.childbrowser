@@ -1,14 +1,18 @@
 (function () {
 
 	var API_URL = "blackberry/polarmobile/childbrowser";
-	var URL_PARAM_NAME = "url"
+	var URL_PARAM_NAME = "url";
+	var JS_EVENT_HANDLER_ID = "jsEventHandlerId";
 	
 	function ChildBrowser() {
 	};
 
-	function loadURL(url){
+	function loadURL(url,jsEventHandler){
+		var jsEventHandlerId = blackberry.events.registerEventHandler("jsEventHandler", jsEventHandler);
+
 		var remoteCall = new blackberry.transport.RemoteFunctionCall(API_URL + "/loadURL");
 		remoteCall.addParam(URL_PARAM_NAME, url); 
+		remoteCall.addParam(JS_EVENT_HANDLER_ID, jsEventHandlerId); 
 		return remoteCall.makeSyncCall();
 	}
 
@@ -47,8 +51,8 @@
 		return remoteCall.makeSyncCall();
 	}
 	
-	ChildBrowser.prototype.loadURL = function(url) {
-		return loadURL(url);
+	ChildBrowser.prototype.loadURL = function(url,jsEventHandler) {
+		return loadURL(url,jsEventHandler);
 	};
 
 	ChildBrowser.prototype.clearCookies = function() {
